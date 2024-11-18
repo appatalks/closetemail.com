@@ -164,23 +164,6 @@ def push_image_to_branch(image_path):
     subprocess.run(["git", "add", image_path])
     subprocess.run(["git", "commit", "-m", commit_message])
     subprocess.run(["git", "push", "origin", branch_name, "--force"])
-    branch_name = "generated"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    commit_message = f"Add generated kitten image {timestamp}"
-
-    # Set Git user information for Actions
-    subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"])
-    subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions"])
-    
-    # Ensure the branch is updated before attempting to push
-    subprocess.run(["git", "fetch", "origin", branch_name])
-    subprocess.run(["git", "checkout", "-B", branch_name])
-    subprocess.run(["git", "pull", "origin", branch_name, "--rebase"])
-    
-    # Add, commit, and push the changes
-    subprocess.run(["git", "add", image_path])
-    subprocess.run(["git", "commit", "-m", commit_message])
-    subprocess.run(["git", "push", "origin", branch_name, "--force"])
         
 def main():
     pds_url = "https://bsky.social"
