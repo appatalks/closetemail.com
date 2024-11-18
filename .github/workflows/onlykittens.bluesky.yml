@@ -1,8 +1,8 @@
 name: OnlyKittens Bot Workflow
 
 on:
-  #schedule:
-  #  - cron: "0 9,21 * * *" # Runs twice a day, at 9:00 AM and 9:00 PM UTC
+  schedule:
+    - cron: "0 15,23 * * *" # Runs twice a day, at 3:00 PM and 11:00 PM UTC
 
   workflow_dispatch:
     # Allows manual triggers of the workflow for testing.
