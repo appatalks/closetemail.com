@@ -63,10 +63,14 @@ def generate_kitten_fact():
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "user", "content": "Provide a cute and fun fact about kittens."}
+            {"role": "system", "content": "You are an artist and a poet. You like to give fun, quick, quirky and little-known facts about cats and kittens."},
+            {"role": "user", "content": "Can you tell me something about cats in one short sentance?"}
         ]
     )
-    return response.choices[0].message['content'].strip()
+    
+    # Directly access the 'content' attribute of the message
+    fact = response.choices[0].message.content
+    return fact
 
 def download_image(image_url, save_path):
     img_data = requests.get(image_url).content
@@ -204,6 +208,7 @@ def main():
     else:
         # Generate a kitten fun fact
         post_content = generate_kitten_fact()
+        print("Kitten Fact:", post_content)
         embed = None
 
     # Create a post on Bluesky
