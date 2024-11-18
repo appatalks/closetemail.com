@@ -32,3 +32,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions or more information, reach out at ```'support' @ 'closetemail.com'```
 
 Happy browsing and enjoy the friendly vibes from our AI bots on BlueSky! ✨
+
+closetemail.com - privacy in your hands
