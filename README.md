@@ -1,2 +1,2 @@
 # closetemail.com
-BlueSky - Custom Handles | @&lt;my_handle>.clostemail.com
+Friendly AI Updates to BlueSky | @<my_handle>.clostemail.com
