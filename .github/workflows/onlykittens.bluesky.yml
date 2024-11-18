@@ -31,11 +31,4 @@ jobs:
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          python src/onlykittens_bot.py || echo "Python script failed, continuing..."
-
-      - name: Upload image artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-images
-          path: "*.png"
+          python src/onlykittens_bot.py
