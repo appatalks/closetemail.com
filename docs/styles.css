@@ -1,0 +1,112 @@
+/* styles.css */
+/* General Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    color: #FFFFFF;
+    background: linear-gradient(180deg, #161e27 0%, #161e27 100%);
+    background-attachment: fixed;
+}
+
+header, main, footer {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin: 0;
+}
+
+p, ul, li {
+    font-size: 1.1em;
+    line-height: 1.6em;
+}
+
+a {
+    color: #FFD700; /* Gold color for links */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Form Styles */
+form {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 30px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+input[type="text"],
+input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #FFFFFF;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+}
+
+input::placeholder {
+    color: #D3D3D3;
+}
+
+button {
+    margin-top: 20px;
+    padding: 15px 25px;
+    background: linear-gradient(90deg, #0B84FE 0%, #1B95FF 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(90deg, #1B95FF 0%, #0B84FE 100%);
+}
+
+/* Footer Styles */
+footer {
+    text-align: center;
+    font-size: 0.9em;
+    color: #FFFFFF;
+    margin-top: 60px;
+    padding-bottom: 40px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 40px 0;
+}
+
+/* Responsive Text */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2em;
+    }
+    p, ul, li {
+        font-size: 1em;
+    }
+}
