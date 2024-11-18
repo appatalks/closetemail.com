@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from typing import List
 from PIL import Image
 import io
+import subprocess
 
 def bsky_login_session(pds_url: str, handle: str, password: str):
     resp = requests.post(
@@ -118,10 +119,7 @@ def upload_file(pds_url, access_token, filename, img_bytes) -> dict:
 
     resp = requests.post(
         pds_url + "/xrpc/com.atproto.repo.uploadBlob",
-        headers={
-            "Content-Type": mimetype,
-            "Authorization": "Bearer " + access_token,
-        },
+        headers={"Content-Type": mimetype, "Authorization": "Bearer " + access_token},
         data=img_bytes,
     )
     resp.raise_for_status()
@@ -143,6 +141,43 @@ def upload_images(pds_url: str, access_token: str, image_paths: List[str], alt_t
         "images": images,
     }
 
+def push_image_to_branch(image_path):
+    branch_name = "generated"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    commit_message = f"Add generated kitten image {timestamp}"
+
+    # Set Git user information for Actions
+    subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"])
+    subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions"])
+
+    # Ensure the branch is updated before attempting to push
+    subprocess.run(["git", "fetch", "origin", branch_name])
+    subprocess.run(["git", "checkout", "-B", branch_name])
+    subprocess.run(["git", "reset", "--hard", f"origin/{branch_name}"])
+    subprocess.run(["git", "pull", "origin", branch_name, "--rebase"])
+
+    # Add, commit, and push the changes
+    subprocess.run(["git", "add", image_path])
+    subprocess.run(["git", "commit", "-m", commit_message])
+    subprocess.run(["git", "push", "origin", branch_name, "--force"])
+    branch_name = "generated"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    commit_message = f"Add generated kitten image {timestamp}"
+
+    # Set Git user information for Actions
+    subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"])
+    subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions"])
+    
+    # Ensure the branch is updated before attempting to push
+    subprocess.run(["git", "fetch", "origin", branch_name])
+    subprocess.run(["git", "checkout", "-B", branch_name])
+    subprocess.run(["git", "pull", "origin", branch_name, "--rebase"])
+    
+    # Add, commit, and push the changes
+    subprocess.run(["git", "add", image_path])
+    subprocess.run(["git", "commit", "-m", commit_message])
+    subprocess.run(["git", "push", "origin", branch_name, "--force"])
+        
 def main():
     pds_url = "https://bsky.social"
     handle = os.getenv("BLUESKY_HANDLE")
@@ -155,12 +190,17 @@ def main():
     if random.choice([True, False]):
         # Generate a kitten image
         image_url = generate_kitten_image()
-        download_image(image_url, "generated_kitten.png")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        image_path = f"generated/images/generated_kitten_{timestamp}.png"
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
+        download_image(image_url, image_path)
         # Compress the image to ensure it's under 1MB
-        compress_image("generated_kitten.png")
+        compress_image(image_path)
         alt_text = "A cute kitten in a playful pose"
-        embed = upload_images(pds_url, session["accessJwt"], ["generated_kitten.png"], alt_text)
-        post_content = "🐾🐾🐾"
+        embed = upload_images(pds_url, session["accessJwt"], [image_path], alt_text)
+        post_content = "Check out this adorable kitten! 🐾"
+        # Push image to generated branch
+        push_image_to_branch(image_path)
     else:
         # Generate a kitten fun fact
         post_content = generate_kitten_fact()
