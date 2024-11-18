@@ -49,7 +49,7 @@ def generate_kitten_image():
         },
         json={
             "model": "dall-e-3",
-            "prompt": "A super cute kitten in a playful pose with a beautiful background, very colorful and detailed",
+            "prompt": "Create an image of kittens that is unique every time. Randomize the art style, such as surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. Change the setting—like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places—each time. Make sure to vary colors, lighting, and moods too, and use different breeds of kittens. Let the kittens be doing anything from playing to resting, exploring, or interacting in surprising ways. Each new image should feel fresh, creative, and unlike any previous one.",
             "n": 1,
             "size": "1024x1024"
         }
