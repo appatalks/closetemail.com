@@ -4,78 +4,10 @@
     <meta charset="UTF-8">
     <title>Get Your Custom BlueSky Handle with ClosetEmail.com</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- You can add CSS styles here -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        header, main, footer {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-        }
-        header {
-            background-color: #f2f2f2;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
-        form {
-            margin-top: 20px;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="email"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-        }
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #007acc;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #005f99;
-        }
-        nav {
-            margin-top: 20px;
-            text-align: center;
-        }
-        nav a {
-            margin: 0 10px;
-            color: #007acc;
-            text-decoration: none;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        footer {
-            text-align: center;
-            font-size: 0.9em;
-            color: #777;
-            margin-top: 40px;
-        }
-        hr {
-            border: none;
-            border-top: 1px solid #e0e0e0;
-            margin: 40px 0;
-        }
-        code {
-            background-color: #f4f4f4;
-            padding: 2px 4px;
-            font-size: 0.95em;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -123,8 +55,7 @@
     <h2 id="request-form">Request Form</h2>
     <p>Please complete the form below to request your custom BlueSky handle.</p>
 
-    <!-- Since GitHub Pages is static, you'll need to use a form service. Replace 'YOUR_FORM_ACTION_URL' with the actual form action URL. -->
-
+    <!-- Replace 'YOUR_FORM_ACTION_URL' with your actual form action URL -->
     <form action="YOUR_FORM_ACTION_URL" method="POST">
         <h3>Desired Username</h3>
         <p><em>Example: if you enter "alex", your handle will be <code>@alex.closetemail.com</code>.</em></p>
@@ -181,8 +112,8 @@
 <footer>
     <p><strong>ClosetEmail.com</strong> – Empowering your online identity.</p>
     <nav>
-        <a href="#terms-of-service">Terms of Service</a> | 
-        <a href="#privacy-policy">Privacy Policy</a> | 
+        <a href="#terms-of-service">Terms of Service</a> |
+        <a href="#privacy-policy">Privacy Policy</a> |
         <a href="#contact">Contact Us</a>
     </nav>
 </footer>
