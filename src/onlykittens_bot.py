@@ -185,7 +185,7 @@ def main():
         compress_image(image_path)
         alt_text = "A cute kitten in a playful pose"
         embed = upload_images(pds_url, session["accessJwt"], [image_path], alt_text)
-        post_content = "🐾🐾🐾🐾"
+        post_content = "🐾🐾 kittens and cats 🐾🐾"
         # Push image to generated branch
         push_image_to_branch(image_path)
     else:
