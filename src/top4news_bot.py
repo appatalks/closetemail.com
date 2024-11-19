@@ -1,67 +1,46 @@
 import os
 import requests
 import subprocess
-from datetime import datetime, timezone
+from datetime import datetime
 
-# Function to fetch top 4 news headlines and format timestamps
+# Function to fetch top 4 news headlines
 def fetch_top4_news():
     # Run the curl pipeline command
     curl_command = """
     curl -s "https://ground.news/interest/international" | \
     grep -o '"start":"[^"]*","title":"[^"]*"' | \
     sed -E 's/"start":"([^"]*)","title":"([^"]*)"/\\1 - \\2/' | \
-    awk -F ' - ' '{ cmd="date -u -d \\"" $1 "\\" +\\"%Y-%m-%d %H:%M UTC\\""; cmd | getline new_date; close(cmd); print new_date " - " $2 }' | \
-    sort | head -n 4
+    awk -F ' - ' '{print $2}' | head -n 4
     """
     result = subprocess.run(curl_command, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
         raise RuntimeError(f"Error fetching news: {result.stderr}")
     return result.stdout.strip().split("\n")
 
-# Function to log in to Bluesky
-def bsky_login_session(pds_url: str, handle: str, password: str):
-    resp = requests.post(
-        pds_url + "/xrpc/com.atproto.server.createSession",
-        json={"identifier": handle, "password": password},
-    )
-    resp.raise_for_status()
-    return resp.json()
-
-# Function to create a Bluesky post
-def create_bsky_post(session, pds_url, post_content, embed=None):
-    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    post = {
-        "$type": "app.bsky.feed.post",
-        "text": post_content,
-        "createdAt": now,
-    }
-    if embed:
-        post["embed"] = embed
+# Function to reduce content to a 300-character limit
+def reduce_to_300_chars(headlines, additional_text):
+    max_length = 300 - len(additional_text) - len("\n - ") * len(headlines)  # Account for formatting
+    combined_length = sum(len(headline) for headline in headlines)
     
-    resp = requests.post(
-        pds_url + "/xrpc/com.atproto.repo.createRecord",
-        headers={"Authorization": "Bearer " + session["accessJwt"]},
-        json={
-            "repo": session["did"],
-            "collection": "app.bsky.feed.post",
-            "record": post,
-        },
-    )
-    resp.raise_for_status()
-    return resp.json()
+    while combined_length > max_length:
+        # Find the longest headline and remove the last word
+        for i, headline in enumerate(headlines):
+            if len(headline.split()) > 1:  # Ensure there's more than one word to trim
+                words = headline.split()
+                headlines[i] = " ".join(words[:-1])  # Remove the last word
+                break
+        combined_length = sum(len(headline) for headline in headlines)
+    
+    return headlines
 
+# Function to format the date with a suffix
 def get_date_with_suffix():
-    # Get the current UTC date
     today = datetime.utcnow()
     day = today.day
-
-    # Determine the suffix for the day
     if 11 <= day <= 13:
         suffix = "th"
     else:
         suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
-    
-    # Format the date as "Monday, November 12th, 2024"
     return today.strftime(f"%A, %B {day}{suffix}, %Y")
 
 def main():
@@ -71,26 +50,37 @@ def main():
     password = os.getenv("BLUESKY_TOP4NEWS_P")
     
     # Log in to Bluesky
+    # Uncomment to enable posting
     # session = bsky_login_session(pds_url, handle, password)
     
     # Fetch top 4 news headlines
-    top4_news = fetch_top4_news()
+    try:
+        top4_news = fetch_top4_news()
+    except RuntimeError as e:
+        print("Error fetching news:", e)
+        return
     
-    # Get the formatted date with a suffix
+    # Format the date and additional text
     formatted_date = get_date_with_suffix()
+    additional_text = f"Read more at: https://ground.news/"
+    post_header = f"Top Headlines for {formatted_date}:\n"
     
-    # Combine the news headlines into a single post with a link
+    # Reduce content to 300 characters
+    trimmed_headlines = reduce_to_300_chars(top4_news, post_header + additional_text)
+    
+    # Combine the headlines with the formatted header and link
     post_content = (
-        f"Top Headlines for {formatted_date}:\n" +
-        "\n".join(top4_news) +
-        "\n\nRead more at: https://ground.news/interest/international"
+        post_header +
+        "\n - ".join([""] + trimmed_headlines) +  # Add " - " before each headline
+        f"\n\n{additional_text}"
     )
     
     # Post to Bluesky
-    # create_bsky_post(session, pds_url, post_content, embed)
+    # Uncomment to enable posting
+    # create_bsky_post(session, pds_url, post_content, embed=None)
 
-    # Debug
-    print("Debug Response:", post_content)
+    # Debug output
+    print("Debug Response:\n", post_content)
 
 if __name__ == "__main__":
     main()
