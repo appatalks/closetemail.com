@@ -19,9 +19,10 @@ def fetch_top4_news():
 
 # Function to reduce content to a 300-character limit
 def reduce_to_300_chars(headlines, additional_text):
+    # Calculate the maximum length allowed for the headlines
     max_length = 300 - len(additional_text) - len("\n - ") * len(headlines)  # Account for formatting
     combined_length = sum(len(headline) for headline in headlines)
-    
+
     # Step 1: Remove words after the last comma for headlines with >2 commas
     for i, headline in enumerate(headlines):
         if headline.count(",") > 2:
@@ -31,16 +32,20 @@ def reduce_to_300_chars(headlines, additional_text):
     
     # Recalculate combined length after trimming by commas
     combined_length = sum(len(headline) for headline in headlines)
-    
+
     # Step 2: Iteratively remove the last word from the longest headlines until within limit
     while combined_length > max_length:
-        for i, headline in enumerate(headlines):
-            if len(headline.split()) > 1:  # Ensure there's more than one word to trim
-                words = headline.split()
-                headlines[i] = " ".join(words[:-1])  # Remove the last word
-                break
+        # Find the headline that is longest and trim its last word
+        longest_idx = max(range(len(headlines)), key=lambda x: len(headlines[x]))
+        if len(headlines[longest_idx].split()) > 1:  # Ensure there's more than one word to trim
+            words = headlines[longest_idx].split()
+            headlines[longest_idx] = " ".join(words[:-1])
+        else:
+            # If a headline only has one word, leave it alone and move to others
+            break
+        
         combined_length = sum(len(headline) for headline in headlines)
-    
+
     return headlines
 
 # Function to format the date with a suffix
@@ -94,3 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
