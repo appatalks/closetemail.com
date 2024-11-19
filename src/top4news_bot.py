@@ -135,6 +135,7 @@ def main():
         "\n - ".join([""] + trimmed_headlines) +  # Add " - " before each headline
         f"\n\n{additional_text}"
     )
+    embed = None
     
     # Post to Bluesky
     create_bsky_post(session, pds_url, post_content, embed)
