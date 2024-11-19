@@ -137,7 +137,7 @@ def main():
     )
     
     # Post to Bluesky
-    create_bsky_post(session, pds_url, post_content, embed=None)
+    create_bsky_post(session, pds_url, post_content, embed)
 
     # Debug output
     print("Debug Response:\n", post_content)
