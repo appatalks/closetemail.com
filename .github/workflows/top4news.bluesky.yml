@@ -8,7 +8,7 @@ on:
     # Allows manual triggers of the workflow for testing.
 
 jobs:
-  post_kitten_content:
+  post_top4news_content:
     runs-on: ubuntu-latest
 
     steps:
