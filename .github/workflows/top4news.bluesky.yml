@@ -1,0 +1,33 @@
+name: top4news Bluesky Workflow
+
+on:
+  #schedule:
+  #  - cron: "0 13 * * *" # Runs once a day, at 1:00 PM UTC
+
+  workflow_dispatch:
+    # Allows manual triggers of the workflow for testing.
+
+jobs:
+  post_kitten_content:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests openai pillow image
+
+      - name: Run top4news Bot
+        env:
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_TOP4NEWS_H }}
+          BLUESKY_PASSWORD: ${{ secrets.BLUESKY_TOP4NEWS_P }}
+        run: |
+          python src/top4news_bot.py
