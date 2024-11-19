@@ -27,7 +27,7 @@ jobs:
 
       - name: Run top4news Bot
         env:
-          BLUESKY_HANDLE: ${{ secrets.BLUESKY_TOP4NEWS_H }}
-          BLUESKY_PASSWORD: ${{ secrets.BLUESKY_TOP4NEWS_P }}
+          BLUESKY_TOP4NEWS_H: ${{ secrets.BLUESKY_TOP4NEWS_H }}
+          BLUESKY_TOP4NEWS_P: ${{ secrets.BLUESKY_TOP4NEWS_P }}
         run: |
           python src/top4news_bot.py
