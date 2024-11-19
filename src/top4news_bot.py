@@ -113,6 +113,7 @@ def main():
     
     # Log in to Bluesky
     session = bsky_login_session(pds_url, handle, password)
+    print("Session data:", session)  # Debug session details
     
     # Fetch top 4 news headlines
     try:
