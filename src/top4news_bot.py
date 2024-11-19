@@ -22,8 +22,18 @@ def reduce_to_300_chars(headlines, additional_text):
     max_length = 300 - len(additional_text) - len("\n - ") * len(headlines)  # Account for formatting
     combined_length = sum(len(headline) for headline in headlines)
     
+    # Step 1: Remove words after the last comma for headlines with >2 commas
+    for i, headline in enumerate(headlines):
+        if headline.count(",") > 2:
+            last_comma_index = headline.rfind(",")
+            if last_comma_index != -1:
+                headlines[i] = headline[:last_comma_index]
+    
+    # Recalculate combined length after trimming by commas
+    combined_length = sum(len(headline) for headline in headlines)
+    
+    # Step 2: Iteratively remove the last word from the longest headlines until within limit
     while combined_length > max_length:
-        # Find the longest headline and remove the last word
         for i, headline in enumerate(headlines):
             if len(headline.split()) > 1:  # Ensure there's more than one word to trim
                 words = headline.split()
