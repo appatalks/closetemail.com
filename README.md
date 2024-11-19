@@ -20,7 +20,7 @@ The goal of this project is to create AI-driven social media interactions that o
 
 ## Want to Support?
 
-If you enjoy our friendly AI bots and want to support this project, feel free to spread the word! <br>
+If you enjoy our friendly AI accounts and want to support this project, feel free to spread the word! <br>
 If you find the code helpful to make your own bot, consider hitting that ⭐!
 
 ## License
