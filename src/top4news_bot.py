@@ -4,14 +4,14 @@ import subprocess
 import string
 from datetime import datetime
 
-# Function to fetch top 4 news headlines
+# Function to fetch top 4 news headlines / actually 3 cause of 300 char limit for now.
 def fetch_top4_news():
     # Run the curl pipeline command
     curl_command = """
     curl -s "https://ground.news/interest/international" | \
     grep -o '"start":"[^"]*","title":"[^"]*"' | \
     sed -E 's/"start":"([^"]*)","title":"([^"]*)"/\\1 - \\2/' | \
-    awk -F ' - ' '{print $2}' | head -n 4
+    awk -F ' - ' '{print $2}' | head -n 3
     """
     result = subprocess.run(curl_command, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
@@ -59,7 +59,7 @@ def reduce_to_300_chars(headlines, additional_text):
     # Step 3: Add ".." to truncated headlines
     for i in truncated_indices:
         if not headlines[i].endswith(".."):
-            headlines[i] += " .."
+            headlines[i] += ".."
 
     return headlines
 
@@ -92,7 +92,7 @@ def main():
     
     # Format the date and additional text
     formatted_date = get_date_with_suffix()
-    additional_text = f"Read more at: https://ground.news/"
+    additional_text = f"Top 4th at the source: https://ground.news/"
     post_header = f"Top Headlines for {formatted_date}:\n"
     
     # Reduce content to 300 characters
