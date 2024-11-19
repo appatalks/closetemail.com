@@ -17,8 +17,8 @@ def bsky_login_session(pds_url: str, handle: str, password: str):
 
 # Function to create a Bluesky post
 def create_bsky_post(session, pds_url, post_content, embed=None):
-    # Extract URLs from the post content
-    link_spans = parse_urls(post_content)
+    # Extract URL facets from the post content
+    facets = parse_facets(post_content)
     
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     post = {
@@ -27,39 +27,34 @@ def create_bsky_post(session, pds_url, post_content, embed=None):
         "createdAt": now,
     }
 
-    # Include the links in the post using the extracted link spans
-    if link_spans:
-        post["facets"] = [
-            {
-                "features": [
-                    {
-                        "$type": "app.bsky.richtext.facet#link",
-                        "uri": span["url"]
-                    }
-                ],
-                "index": {
-                    "start": span["start"],
-                    "end": span["end"]
-                }
-            } for span in link_spans
-        ]    
-    
+    # Include the facets in the post using the parsed facets
+    if facets:
+        post["facets"] = facets
+
     if embed:
         post["embed"] = embed
     
-    resp = requests.post(
-        pds_url + "/xrpc/com.atproto.repo.createRecord",
-        headers={"Authorization": "Bearer " + session["accessJwt"]},
-        json={
-            "repo": session["did"],
-            "collection": "app.bsky.feed.post",
-            "record": post,
-        },
-    )
-    resp.raise_for_status()
+    try:
+        resp = requests.post(
+            pds_url + "/xrpc/com.atproto.repo.createRecord",
+            headers={"Authorization": f"Bearer {session['accessJwt']}"},
+            json={
+                "repo": session["did"],
+                "collection": "app.bsky.feed.post",
+                "record": post,
+            },
+        )
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        # Print additional debugging information
+        print(f"HTTP Error: {e}")
+        print(f"Response Status Code: {resp.status_code}")
+        print(f"Response Content: {resp.text}")
+        raise
+
     return resp.json()
 
-# Function to fetch top 4 news headlines / actually 3 cause of 300 char limit for now.
+# Function to fetch top 3 news headlines (due to character limit)
 def fetch_top4_news():
     # Run the curl pipeline command
     curl_command = """
@@ -114,7 +109,7 @@ def reduce_to_300_chars(headlines, additional_text):
     # Step 3: Add ".." to truncated headlines
     for i in truncated_indices:
         if not headlines[i].endswith(".."):
-            headlines[i] += ".."
+            headlines[i] += " .."
 
     return headlines
 
@@ -132,7 +127,6 @@ def get_date_with_suffix():
 def parse_urls(text: str) -> List[Dict]:
     spans = []
     # Partial/naive URL regex based on: https://stackoverflow.com/a/3809435
-    # Tweaked to disallow some trailing punctuation
     url_regex = rb"[$|\W](https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@%_\+~#//=])?)"
     text_bytes = text.encode("UTF-8")
     for m in re.finditer(url_regex, text_bytes):
@@ -142,6 +136,24 @@ def parse_urls(text: str) -> List[Dict]:
             "url": m.group(1).decode("UTF-8"),
         })
     return spans
+
+# Function to parse facets from the text
+def parse_facets(text: str) -> List[Dict]:
+    facets = []
+    for u in parse_urls(text):
+        facets.append({
+            "index": {
+                "byteStart": u["start"],
+                "byteEnd": u["end"],
+            },
+            "features": [
+                {
+                    "$type": "app.bsky.richtext.facet#link",
+                    "uri": u["url"],
+                }
+            ],
+        })
+    return facets
 
 def main():
     # Bluesky setup
@@ -153,20 +165,20 @@ def main():
     session = bsky_login_session(pds_url, handle, password)
     print("Session data:", session)  # Debug session details
     
-    # Fetch top 4 news headlines
+    # Fetch top 3 news headlines
     try:
-        top4_news = fetch_top4_news()
+        top3_news = fetch_top4_news()
     except RuntimeError as e:
         print("Error fetching news:", e)
         return
     
     # Format the date and additional text
     formatted_date = get_date_with_suffix()
-    additional_text = f"4th at source: https://ground.news/"
-    post_header = f"{formatted_date}:\n"
+    additional_text = "Read more at: https://ground.news/"
+    post_header = f"Top Headlines for {formatted_date}:\n"
     
     # Reduce content to 300 characters
-    trimmed_headlines = reduce_to_300_chars(top4_news, post_header + additional_text)
+    trimmed_headlines = reduce_to_300_chars(top3_news, post_header + additional_text)
     
     # Combine the headlines with the formatted header and link
     post_content = (
@@ -177,7 +189,11 @@ def main():
     embed = None
     
     # Post to Bluesky
-    create_bsky_post(session, pds_url, post_content, embed)
+    try:
+        create_bsky_post(session, pds_url, post_content, embed)
+    except requests.exceptions.HTTPError as e:
+        print("Failed to create post:", e)
+        return
 
     # Debug output
     print("Debug Response:\n", post_content)
