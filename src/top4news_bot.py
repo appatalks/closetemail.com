@@ -1,6 +1,7 @@
 import os
 import requests
 import subprocess
+import string
 from datetime import datetime
 
 # Function to fetch top 4 news headlines
@@ -19,6 +20,10 @@ def fetch_top4_news():
 
 # Function to reduce content to a 300-character limit
 def reduce_to_300_chars(headlines, additional_text):
+    # Remove punctuation from each headline
+    translator = str.maketrans("", "", string.punctuation)
+    headlines = [headline.translate(translator) for headline in headlines]
+    
     # Calculate the maximum length allowed for the headlines
     max_length = 300 - len(additional_text) - len("\n - ") * len(headlines)  # Account for formatting
     combined_length = sum(len(headline) for headline in headlines)
