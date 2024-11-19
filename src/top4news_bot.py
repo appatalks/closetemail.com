@@ -174,8 +174,8 @@ def main():
     
     # Format the date and additional text
     formatted_date = get_date_with_suffix()
-    additional_text = "Read more at: https://ground.news/"
-    post_header = f"Top Headlines for {formatted_date}:\n"
+    additional_text = "4th at: https://ground.news/"
+    post_header = f"{formatted_date}:\n"
     
     # Reduce content to 300 characters
     trimmed_headlines = reduce_to_300_chars(top3_news, post_header + additional_text)
