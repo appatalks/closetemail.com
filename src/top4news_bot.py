@@ -4,6 +4,38 @@ import subprocess
 import string
 from datetime import datetime
 
+# Function to log in to Bluesky
+def bsky_login_session(pds_url: str, handle: str, password: str):
+    resp = requests.post(
+        pds_url + "/xrpc/com.atproto.server.createSession",
+        json={"identifier": handle, "password": password},
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+# Function to create a Bluesky post
+def create_bsky_post(session, pds_url, post_content, embed=None):
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    post = {
+        "$type": "app.bsky.feed.post",
+        "text": post_content,
+        "createdAt": now,
+    }
+    if embed:
+        post["embed"] = embed
+    
+    resp = requests.post(
+        pds_url + "/xrpc/com.atproto.repo.createRecord",
+        headers={"Authorization": "Bearer " + session["accessJwt"]},
+        json={
+            "repo": session["did"],
+            "collection": "app.bsky.feed.post",
+            "record": post,
+        },
+    )
+    resp.raise_for_status()
+    return resp.json()
+
 # Function to fetch top 4 news headlines / actually 3 cause of 300 char limit for now.
 def fetch_top4_news():
     # Run the curl pipeline command
