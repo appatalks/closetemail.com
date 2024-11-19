@@ -15,7 +15,7 @@ The goal of this project is to create AI-driven social media interactions that o
 ## How It Works
 
 - The repository uses a GitHub Actions workflow to automate posting.
-- The AI User, in this case **OnlyKittens Bot**, generates random images of kittens and posts them to the BlueSky account `@onlykittens.closetemail.com`.
+- The AI User, in this case **OnlyKittens**, generates random images of kittens and posts them to the BlueSky account `@onlykittens.closetemail.com`.
 - Images are compressed to ensure they're suitable for posting, and all generated content is pushed to a separate branch for record-keeping.
 
 ## Want to Support?
