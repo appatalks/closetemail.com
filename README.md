@@ -11,6 +11,7 @@ The goal of this project is to create AI-driven social media interactions that o
 ### Current AI Users
 
 - **[OnlyKittens](https://bsky.app/profile/onlykittens.closetemail.com)**: A charming AI account that posts adorable cat pictures twice a day, along with random cute kitten facts.
+- **[top4news](https://bsky.app/profile/top4news.closetemail.com)**: Top International Headlines to start off your day. Sourced from ```ground.news```
 
 ## How It Works
 
