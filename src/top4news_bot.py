@@ -87,7 +87,7 @@ def main():
     )
     
     # Post to Bluesky
-    create_bsky_post(session, pds_url, post_content)
+    create_bsky_post(session, pds_url, post_content, embed)
 
 if __name__ == "__main__":
     main()
