@@ -1,4 +1,4 @@
-name: OnlyKittens Bot Workflow
+name: OnlyKittens Bluesky Workflow
 
 on:
   schedule:
