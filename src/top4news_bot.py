@@ -80,8 +80,7 @@ def main():
     password = os.getenv("BLUESKY_TOP4NEWS_P")
     
     # Log in to Bluesky
-    # Uncomment to enable posting
-    # session = bsky_login_session(pds_url, handle, password)
+    session = bsky_login_session(pds_url, handle, password)
     
     # Fetch top 4 news headlines
     try:
@@ -106,12 +105,10 @@ def main():
     )
     
     # Post to Bluesky
-    # Uncomment to enable posting
-    # create_bsky_post(session, pds_url, post_content, embed=None)
+    create_bsky_post(session, pds_url, post_content, embed=None)
 
     # Debug output
     print("Debug Response:\n", post_content)
 
 if __name__ == "__main__":
     main()
-
