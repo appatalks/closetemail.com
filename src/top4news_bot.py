@@ -28,13 +28,17 @@ def reduce_to_300_chars(headlines, additional_text):
     max_length = 300 - len(additional_text) - len("\n - ") * len(headlines)  # Account for formatting
     combined_length = sum(len(headline) for headline in headlines)
 
+    # Track which headlines were truncated
+    truncated_indices = set()
+
     # Step 1: Remove words after the last comma for headlines with >2 commas
     for i, headline in enumerate(headlines):
         if headline.count(",") > 2:
             last_comma_index = headline.rfind(",")
             if last_comma_index != -1:
                 headlines[i] = headline[:last_comma_index]
-    
+                truncated_indices.add(i)
+
     # Recalculate combined length after trimming by commas
     combined_length = sum(len(headline) for headline in headlines)
 
@@ -45,11 +49,17 @@ def reduce_to_300_chars(headlines, additional_text):
         if len(headlines[longest_idx].split()) > 1:  # Ensure there's more than one word to trim
             words = headlines[longest_idx].split()
             headlines[longest_idx] = " ".join(words[:-1])
+            truncated_indices.add(longest_idx)
         else:
             # If a headline only has one word, leave it alone and move to others
             break
         
         combined_length = sum(len(headline) for headline in headlines)
+
+    # Step 3: Add ".." to truncated headlines
+    for i in truncated_indices:
+        if not headlines[i].endswith(".."):
+            headlines[i] += " .."
 
     return headlines
 
