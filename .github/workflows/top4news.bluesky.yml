@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests openai pillow image
+          pip install requests
 
       - name: Run top4news Bot
         env:
