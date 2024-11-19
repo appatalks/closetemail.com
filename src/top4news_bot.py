@@ -71,7 +71,7 @@ def main():
     password = os.getenv("BLUESKY_TOP4NEWS_P")
     
     # Log in to Bluesky
-    session = bsky_login_session(pds_url, handle, password)
+    # session = bsky_login_session(pds_url, handle, password)
     
     # Fetch top 4 news headlines
     top4_news = fetch_top4_news()
@@ -87,7 +87,10 @@ def main():
     )
     
     # Post to Bluesky
-    create_bsky_post(session, pds_url, post_content, embed)
+    # create_bsky_post(session, pds_url, post_content, embed)
+
+    # Debug
+    print("Debug Response:", post_content)
 
 if __name__ == "__main__":
     main()
