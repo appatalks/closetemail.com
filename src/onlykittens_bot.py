@@ -9,6 +9,7 @@ import io
 import subprocess
 
 def bsky_login_session(pds_url: str, handle: str, password: str):
+    # https://docs.bsky.app/docs/get-started#create-a-session
     resp = requests.post(
         pds_url + "/xrpc/com.atproto.server.createSession",
         json={"identifier": handle, "password": password},
