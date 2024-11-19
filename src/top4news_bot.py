@@ -92,7 +92,7 @@ def main():
     
     # Format the date and additional text
     formatted_date = get_date_with_suffix()
-    additional_text = f"Top 4th at the source: https://ground.news/"
+    additional_text = f"4th at the source: https://ground.news/"
     post_header = f"Top Headlines for {formatted_date}:\n"
     
     # Reduce content to 300 characters
