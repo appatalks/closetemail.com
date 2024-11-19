@@ -162,8 +162,8 @@ def main():
     password = os.getenv("BLUESKY_TOP4NEWS_P")
     
     # Log in to Bluesky
-    session = bsky_login_session(pds_url, handle, password)
-    print("Session data:", session)  # Debug session details
+    #session = bsky_login_session(pds_url, handle, password)
+    #print("Session data:", session)  # Debug session details
     
     # Fetch top 3 news headlines
     try:
@@ -189,11 +189,11 @@ def main():
     embed = None
     
     # Post to Bluesky
-    try:
-        create_bsky_post(session, pds_url, post_content, embed)
-    except requests.exceptions.HTTPError as e:
-        print("Failed to create post:", e)
-        return
+    #try:
+    #    create_bsky_post(session, pds_url, post_content, embed)
+    #except requests.exceptions.HTTPError as e:
+    #    print("Failed to create post:", e)
+    #    return
 
     # Debug output
     print("Debug Response:\n", post_content)
