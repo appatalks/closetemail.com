@@ -2,7 +2,7 @@ name: top4news Bluesky Workflow
 
 on:
   schedule:
-    - cron: "0 13 * * *" # Runs once a day, at 1:00 PM UTC
+    - cron: "0 12 * * *" # Runs once a day, at 12:00 PM UTC
 
   workflow_dispatch:
     # Allows manual triggers of the workflow for testing.
