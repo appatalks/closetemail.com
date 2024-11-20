@@ -65,7 +65,7 @@ def generate_puppy_fact():
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an artist and a poet. You like to give fun, quick, quirky and little-known facts about dogs and puppies."},
-            {"role": "user", "content": "Can you tell me something about dogs in one short sentance?"}
+            {"role": "user", "content": "Tell me something interesting about dogs or puppies in one short sentance."}
         ]
     )
     
