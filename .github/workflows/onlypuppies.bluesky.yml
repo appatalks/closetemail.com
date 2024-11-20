@@ -27,8 +27,8 @@ jobs:
 
       - name: Run OnlyPuppies Bot
         env:
-          BLUESKY_HANDLE: ${{ secrets.BLUESKY_PUPPIES_H }}
-          BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PUPPIES_P }}
+          BLUESKY_PUPPIES_H: ${{ secrets.BLUESKY_PUPPIES_H }}
+          BLUESKY_PUPPIES_P: ${{ secrets.BLUESKY_PUPPIES_P }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python src/onlypuppies_bot.py
