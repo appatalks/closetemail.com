@@ -65,7 +65,7 @@ def generate_kitten_fact():
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an artist and a poet. You like to give fun, quick, quirky and little-known facts about cats and kittens."},
-            {"role": "user", "content": "Can you tell me something about cats in one short sentance?"}
+            {"role": "user", "content": "Tell me something interesting about cats in one short sentance."}
         ]
     )
     
