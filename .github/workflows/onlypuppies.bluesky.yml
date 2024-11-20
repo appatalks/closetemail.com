@@ -25,10 +25,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests openai pillow image
 
-      - name: Run OnlyKittens Bot
+      - name: Run OnlyPuppies Bot
         env:
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_PUPPIES_H }}
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PUPPIES_P }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          python src/onlykittens_bot.py
+          python src/onlypuppies_bot.py
