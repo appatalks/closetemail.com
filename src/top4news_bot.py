@@ -75,7 +75,7 @@ def reduce_to_300_chars(headlines, additional_text):
     headlines = [headline.translate(translator) for headline in headlines]
     
     # Calculate the maximum length allowed for the headlines
-    max_length = 296 - len(additional_text) - len("\n - ") * len(headlines)  # Account for formatting
+    max_length = 292 - len(additional_text) - len("\n - ") * len(headlines)  # Account for formatting
     combined_length = sum(len(headline) for headline in headlines)
 
     # Track which headlines were truncated
