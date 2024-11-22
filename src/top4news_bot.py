@@ -68,7 +68,7 @@ def fetch_top4_news():
         raise RuntimeError(f"Error fetching news: {result.stderr}")
     return result.stdout.strip().split("\n")
 
-# Function to reduce content to a 300-character limit
+# Function to reduce content to a < 300-character limit
 def reduce_to_300_chars(headlines, additional_text):
     # Remove punctuation from each headline
     translator = str.maketrans("", "", string.punctuation)
@@ -121,7 +121,8 @@ def get_date_with_suffix():
         suffix = "th"
     else:
         suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
-    return today.strftime(f"%A, %B {day}{suffix}, %Y")
+    # return today.strftime(f"%A, %B {day}{suffix}, %Y") // Has day of week. Saves a few char.
+    return today.strftime(f"%B {day}{suffix}, %Y")
 
 # Function to parse URLs from text and return a list of spans
 def parse_urls(text: str) -> List[Dict]:
