@@ -13,11 +13,19 @@ REQUEST_TIMEOUT = 15  # Timeout for API requests in seconds
 
 # Bluesky API Functions
 def bsky_login_session(pds_url: str, handle: str, password: str):
+    payload = {"identifier": handle, "password": password}
+    print(f"[DEBUG] Payload: {payload}")  # Debugging: Inspect the request payload
     resp = requests.post(
         pds_url + "/xrpc/com.atproto.server.createSession",
-        json={"identifier": handle, "password": password},
+        json=payload,
     )
-    resp.raise_for_status()
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(f"[ERROR] HTTP Error during Bluesky login: {e}")
+        print(f"[DEBUG] Response Status Code: {resp.status_code}")
+        print(f"[DEBUG] Response Content: {resp.text}")
+        raise
     return resp.json()
 
 def create_bsky_post(session, pds_url, post_content, embed=None):
@@ -42,9 +50,9 @@ def create_bsky_post(session, pds_url, post_content, embed=None):
         )
         resp.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        print(f"HTTP Error: {e}")
-        print(f"Response Status Code: {resp.status_code}")
-        print(f"Response Content: {resp.text}")
+        print(f"[ERROR] HTTP Error during Bluesky post creation: {e}")
+        print(f"[DEBUG] Response Status Code: {resp.status_code}")
+        print(f"[DEBUG] Response Content: {resp.text}")
         raise
 
     return resp.json()
