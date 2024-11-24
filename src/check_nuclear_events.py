@@ -33,7 +33,6 @@ def create_bsky_post(session, pds_url, post_content, embed=None):
     try:
         resp = requests.post(
             pds_url + "/xrpc/com.atproto.repo.createRecord",
-            #headers={"Authorization": f"Bearer {session['accessJwt']}"},
             headers={"Authorization": "Bearer " + session["accessJwt"]},
             json={
                 "repo": session["did"],
@@ -49,6 +48,36 @@ def create_bsky_post(session, pds_url, post_content, embed=None):
         raise
 
     return resp.json()
+
+# Combined Posting Function
+def post_to_bsky(post_type, lat, lon, magnitude=None, depth=None, radiation_level=None, radiation_unit=None, radiation_time=None):
+    pds_url = "https://bsky.social"
+    handle = os.getenv("BLUESKY_CLOSET_H")
+    password = os.getenv("BLUESKY_CLOSET_P")
+
+    session = bsky_login_session(pds_url, handle, password)
+
+    if post_type == "simulation":
+        post_content = (
+            f"🌍 Simulation Results 🌍\n\n"
+            f"Simulated Location: ({lat}, {lon})\n"
+            f"Simulated Radiation Level: {radiation_level} CPM\n\n"
+            f"Simulation completed successfully.\n#Simulation #Radiation"
+        )
+    elif post_type == "alert":
+        post_content = (
+            f"⚠️ Alert: Possible Detonation Detected ⚠️\n\n"
+            f"Location: ({lat}, {lon})\n"
+            f"Seismic Event: Magnitude {magnitude}, Depth {depth} km\n"
+            f"Radiation Level: {radiation_level:.2f} {radiation_unit}\n"
+            f"Captured At: {radiation_time}\n\n"
+            f"#SeismicActivity #RadiationAlert"
+        )
+    else:
+        print("[ERROR] Invalid post type specified.")
+        return
+
+    create_bsky_post(session, pds_url, post_content)
 
 # Seismic and Radiation Functions
 def get_usgs_events():
@@ -105,48 +134,11 @@ def get_nearest_radiation_sample(lat, lon):
         print(f"[ERROR] An error occurred: {e}")
         return None, None, None
 
-def post_simulation_to_bsky(lat, lon, radiation_level):
-    pds_url = "https://bsky.social"
-    handle = os.getenv("BLUESKY_CLOSET_H")
-    password = os.getenv("BLUESKY_CLOSET_P")
-
-    session = bsky_login_session(pds_url, handle, password)
-
-    post_content = (
-        f"🌍 Simulation Results 🌍\n\n"
-        f"Simulated Location: ({lat}, {lon})\n"
-        f"Simulated Radiation Level: {radiation_level} CPM\n\n"
-        f"Simulation completed successfully.\n#Simulation #Radiation"
-    )
-    
-    create_bsky_post(session, pds_url, post_content)
-
-def post_alert_to_bsky(lat, lon, magnitude, depth, radiation_level, radiation_unit, radiation_time):
-    pds_url = "https://bsky.social"
-    handle = os.getenv("BLUESKY_CLOSET_H")
-    password = os.getenv("BLUESKY_CLOSET_P")
-
-    session = bsky_login_session(pds_url, handle, password)
-
-    post_content = (
-        f"⚠️ Alert: Possible Detonation Detected ⚠️\n\n"
-        f"Location: ({lat}, {lon})\n"
-        f"Seismic Event: Magnitude {magnitude}, Depth {depth} km\n"
-        f"Radiation Level: {radiation_level:.2f} {radiation_unit}\n"
-        f"Captured At: {radiation_time}\n\n"
-        f"#SeismicActivity #RadiationAlert"
-    )
-    
-    create_bsky_post(session, pds_url, post_content)
-
+# Main Function
 def main(simulate_lat=None, simulate_lon=None, simulate_radiation=None):
-    pds_url = "https://bsky.social"
-    handle = os.getenv("BLUESKY_CLOSET_H")
-    password = os.getenv("BLUESKY_CLOSET_P")
-    session = bsky_login_session(pds_url, handle, password)
     if simulate_lat and simulate_lon and simulate_radiation:
         print(f"[SIMULATION] Simulating event at ({simulate_lat}, {simulate_lon}) with radiation {simulate_radiation} CPM.")
-        post_simulation_to_bsky(simulate_lat, simulate_lon, simulate_radiation)
+        post_to_bsky("simulation", simulate_lat, simulate_lon, radiation_level=simulate_radiation)
         if float(simulate_radiation) > RADIATION_SPIKE_THRESHOLD_CPM:
             print(f"[ALERT] Simulated radiation exceeds threshold! Possible detonation detected at ({simulate_lat}, {simulate_lon}).")
         else:
@@ -172,7 +164,7 @@ def main(simulate_lat=None, simulate_lon=None, simulate_radiation=None):
             print(f"[ALERT] Possible detonation detected at ({lat}, {lon})!")
             print(f"[DETAILS] Detected radiation level: {radiation_level:.2f} {radiation_unit}")
             print(f"[DETAILS] Radiation sample captured at: {radiation_time}")
-            post_alert_to_bsky(lat, lon, magnitude, depth, radiation_level, radiation_unit, radiation_time)
+            post_to_bsky("alert", lat, lon, magnitude, depth, radiation_level, radiation_unit, radiation_time)
             return
 
     print("[INFO] No significant events detected.")
