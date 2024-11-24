@@ -8,7 +8,7 @@ USGS_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query"
 SAFECAST_URL = "https://api.safecast.org/measurements.json"
 MAG_THRESHOLD = 1.0  # Minimum magnitude
 DEPTH_THRESHOLD = 2.0  # Maximum depth (in km)
-RADIATION_SPIKE_THRESHOLD_CPM = 125  # Example threshold for radiation in CPM
+RADIATION_SPIKE_THRESHOLD_CPM = 125  # Threshold for radiation in CPM
 REQUEST_TIMEOUT = 15  # Timeout for API requests in seconds
 
 # Bluesky API Functions
@@ -90,7 +90,7 @@ def post_to_bsky(post_type, lat, lon, magnitude=None, depth=None, radiation_leve
 # Seismic and Radiation Functions
 def get_usgs_events():
     now = datetime.datetime.now(datetime.UTC)
-    past = now - datetime.timedelta(minutes=10)
+    past = now - datetime.timedelta(minutes=15) # Check back in time 15 miniutes for seismic events indicitve of ground burst
     params = {
         "format": "geojson",
         "starttime": past.isoformat(),
@@ -166,6 +166,7 @@ def main(simulate_lat=None, simulate_lon=None, simulate_radiation=None):
     lat, lon = geo[1], geo[0]
     event_time = datetime.datetime.fromtimestamp(props["time"] / 1000).strftime("%Y-%m-%d %H:%M:%S UTC")
 
+    # Only Alert if Seismic AND Radiological activity are detected indicitive of Ground Level Nuclear event
     radiation_level, radiation_unit, radiation_time = get_nearest_radiation_sample(lat, lon)
     if isinstance(magnitude, (int, float)) and magnitude >= MAG_THRESHOLD and depth <= DEPTH_THRESHOLD:
         if radiation_level and radiation_level > RADIATION_SPIKE_THRESHOLD_CPM:
