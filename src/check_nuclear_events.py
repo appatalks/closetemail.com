@@ -106,8 +106,8 @@ def get_nearest_radiation_sample(lat, lon):
 
 def post_simulation_to_bsky(lat, lon, radiation_level):
     pds_url = "https://bsky.social"
-    handle = os.getenv("BLUESKY_HANDLE")
-    password = os.getenv("BLUESKY_PASSWORD")
+    handle = os.getenv("BLUESKY_CLOSET_H")
+    password = os.getenv("BLUESKY_CLOSET_P")
 
     session = bsky_login_session(pds_url, handle, password)
 
@@ -122,8 +122,8 @@ def post_simulation_to_bsky(lat, lon, radiation_level):
 
 def post_alert_to_bsky(lat, lon, magnitude, depth, radiation_level, radiation_unit, radiation_time):
     pds_url = "https://bsky.social"
-    handle = os.getenv("BLUESKY_HANDLE")
-    password = os.getenv("BLUESKY_PASSWORD")
+    handle = os.getenv("BLUESKY_CLOSET_H")
+    password = os.getenv("BLUESKY_CLOSET_P")
 
     session = bsky_login_session(pds_url, handle, password)
 
