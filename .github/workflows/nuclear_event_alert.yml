@@ -1,8 +1,6 @@
 name: Nuclear Event Alert System
 
 on:
-  #schedule:
-  #  - cron: '*/5 * * * *'  # Runs every 5 minutes
   workflow_dispatch:  # Allows for manual trigger
     inputs:
       simulate_lat:
@@ -32,26 +30,22 @@ jobs:
         python-version: '3.x'
 
     - name: Install dependencies
-      run: |
-        pip install requests
+      run: pip install requests
 
-    - name: Build command for monitoring
+    - name: Build and Run Monitoring Command
       env:
         BLUESKY_CLOSET_H: ${{ secrets.BLUESKY_CLOSET_H }}
-        BLUESKY_CLOSET_P: ${{ secrets.BLUESKY_CLOSET_P }}      
-      id: build_command
+        BLUESKY_CLOSET_P: ${{ secrets.BLUESKY_CLOSET_P }}
       run: |
         CMD="python src/check_nuclear_events.py"
-        if [ "${{ inputs.simulate_lat }}" != "" ]; then
+        if [ -n "${{ inputs.simulate_lat }}" ]; then
           CMD="$CMD --simulate-lat ${{ inputs.simulate_lat }}"
         fi
-        if [ "${{ inputs.simulate_lon }}" != "" ]; then
+        if [ -n "${{ inputs.simulate_lon }}" ]; then
           CMD="$CMD --simulate-lon ${{ inputs.simulate_lon }}"
         fi
-        if [ "${{ inputs.simulate_radiation }}" != "" ]; then
+        if [ -n "${{ inputs.simulate_radiation }}" ]; then
           CMD="$CMD --simulate-radiation ${{ inputs.simulate_radiation }}"
         fi
-        echo "command=$CMD" >> $GITHUB_ENV
-
-    - name: Run Monitoring Command
-      run: ${{ env.command }}
+        echo "Running: $CMD"
+        eval $CMD
