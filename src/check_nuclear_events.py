@@ -140,6 +140,10 @@ def post_alert_to_bsky(lat, lon, magnitude, depth, radiation_level, radiation_un
     create_bsky_post(session, pds_url, post_content)
 
 def main(simulate_lat=None, simulate_lon=None, simulate_radiation=None):
+    pds_url = "https://bsky.social"
+    handle = os.getenv("BLUESKY_CLOSET_H")
+    password = os.getenv("BLUESKY_CLOSET_P")
+    session = bsky_login_session(pds_url, handle, password)
     if simulate_lat and simulate_lon and simulate_radiation:
         print(f"[SIMULATION] Simulating event at ({simulate_lat}, {simulate_lon}) with radiation {simulate_radiation} CPM.")
         post_simulation_to_bsky(simulate_lat, simulate_lon, simulate_radiation)
