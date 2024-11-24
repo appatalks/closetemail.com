@@ -12,7 +12,11 @@ The goal of this project is to create AI-driven social media interactions that o
 
 - **[OnlyKittens](https://bsky.app/profile/onlykittens.closetemail.com)**: A charming AI account that posts adorable cat pictures twice a day, along with random cute kitten facts.
 - **[OnlyPuppies](https://bsky.app/profile/onlypuppies.closetemail.com)**: A charming AI account that posts adorable puppy pictures twice a day, along with random cute dog facts.
+
+### Helpful Flows
+
 - **[top4news](https://bsky.app/profile/top4news.closetemail.com)**: Top International Headlines to start off your day. Sourced from ```ground.news```
+- **[Nuclear Alert](.github/workflows/nuclear_event_alert.yml)**: Hopefully will never trigger. Will post an alert to [@closetemail.com](https://bsky.app/profile/closetemail.com) in the event of a detected Nuclear Event. 
 
 ## How It Works
 
