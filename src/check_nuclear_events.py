@@ -14,7 +14,7 @@ REQUEST_TIMEOUT = 15  # Timeout for API requests in seconds
 # Bluesky API Functions
 def bsky_login_session(pds_url: str, handle: str, password: str):
     payload = {"identifier": handle, "password": password}
-    print(f"[DEBUG] Payload: {payload}")  # Debugging: Inspect the request payload
+    # print(f"[DEBUG] Payload: {payload}")  # Debugging: Inspect the request payload
     resp = requests.post(
         pds_url + "/xrpc/com.atproto.server.createSession",
         json=payload,
