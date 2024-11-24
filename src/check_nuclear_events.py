@@ -104,10 +104,26 @@ def get_nearest_radiation_sample(lat, lon):
         print(f"[ERROR] An error occurred: {e}")
         return None, None, None
 
+def post_simulation_to_bsky(lat, lon, radiation_level):
+    pds_url = "https://bsky.social"
+    handle = os.getenv("BLUESKY_HANDLE")
+    password = os.getenv("BLUESKY_PASSWORD")
+
+    session = bsky_login_session(pds_url, handle, password)
+
+    post_content = (
+        f"🌍 Simulation Results 🌍\n\n"
+        f"Simulated Location: ({lat}, {lon})\n"
+        f"Simulated Radiation Level: {radiation_level} CPM\n\n"
+        f"Simulation completed successfully.\n#Simulation #Radiation"
+    )
+    
+    create_bsky_post(session, pds_url, post_content)
+
 def post_alert_to_bsky(lat, lon, magnitude, depth, radiation_level, radiation_unit, radiation_time):
     pds_url = "https://bsky.social"
-    handle = os.getenv("BLUESKY_CLOSET_H")
-    password = os.getenv("BLUESKY_CLOSET_P")
+    handle = os.getenv("BLUESKY_HANDLE")
+    password = os.getenv("BLUESKY_PASSWORD")
 
     session = bsky_login_session(pds_url, handle, password)
 
@@ -125,6 +141,7 @@ def post_alert_to_bsky(lat, lon, magnitude, depth, radiation_level, radiation_un
 def main(simulate_lat=None, simulate_lon=None, simulate_radiation=None):
     if simulate_lat and simulate_lon and simulate_radiation:
         print(f"[SIMULATION] Simulating event at ({simulate_lat}, {simulate_lon}) with radiation {simulate_radiation} CPM.")
+        post_simulation_to_bsky(simulate_lat, simulate_lon, simulate_radiation)
         if float(simulate_radiation) > RADIATION_SPIKE_THRESHOLD_CPM:
             print(f"[ALERT] Simulated radiation exceeds threshold! Possible detonation detected at ({simulate_lat}, {simulate_lon}).")
         else:
