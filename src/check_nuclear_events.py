@@ -33,7 +33,8 @@ def create_bsky_post(session, pds_url, post_content, embed=None):
     try:
         resp = requests.post(
             pds_url + "/xrpc/com.atproto.repo.createRecord",
-            headers={"Authorization": f"Bearer {session['accessJwt']}"},
+            #headers={"Authorization": f"Bearer {session['accessJwt']}"},
+            headers={"Authorization": "Bearer " + session["accessJwt"]},
             json={
                 "repo": session["did"],
                 "collection": "app.bsky.feed.post",
