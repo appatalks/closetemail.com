@@ -37,8 +37,8 @@ jobs:
 
     - name: Build command for monitoring
       env:
-        BLUESKY_HANDLE: ${{ secrets.BLUESKY_CLOSET_H }}
-        BLUESKY_PASSWORD: ${{ secrets.BLUESKY_CLOSET_P }}      
+        BLUESKY_CLOSET_H: ${{ secrets.BLUESKY_CLOSET_H }}
+        BLUESKY_CLOSET_P: ${{ secrets.BLUESKY_CLOSET_P }}      
       id: build_command
       run: |
         CMD="python src/check_nuclear_events.py"
