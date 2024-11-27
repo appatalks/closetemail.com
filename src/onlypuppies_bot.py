@@ -191,9 +191,21 @@ def main():
         push_image_to_branch(image_path)
     else:
         # Generate a puppy fun fact
-        post_content = generate_puppy_fact()
-        print("Puppy Fact:", post_content)
-        embed = None
+        # post_content = generate_puppy_fact() # Disabled as it always generating the same facts...
+        # print("Puppy Fact:", post_content)
+        # embed = None
+        #
+        # Just post a cute pic for now.
+        image_url = generate_puppy_image()
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        image_path = f"generated/images/generated_puppy_{timestamp}.png"
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
+        download_image(image_url, image_path)
+        compress_image(image_path)
+        alt_text = "A cute puppy in a playful pose"
+        embed = upload_images(pds_url, session["accessJwt"], [image_path], alt_text)
+        post_content = "🐾🐾 puppies and dogs 🐾🐾"
+        push_image_to_branch(image_path)
 
     # Create a post on Bluesky
     create_bsky_post(session, pds_url, post_content, embed)
