@@ -191,9 +191,20 @@ def main():
         push_image_to_branch(image_path)
     else:
         # Generate a kitten fun fact
-        post_content = generate_kitten_fact()
-        print("Kitten Fact:", post_content)
-        embed = None
+        #post_content = generate_kitten_fact()
+        #print("Kitten Fact:", post_content)
+        #embed = None
+        #
+        image_url = generate_kitten_image()
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        image_path = f"generated/images/generated_kitten_{timestamp}.png"
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
+        download_image(image_url, image_path)
+        compress_image(image_path)
+        alt_text = "A cute kitten in a playful pose"
+        embed = upload_images(pds_url, session["accessJwt"], [image_path], alt_text)
+        post_content = "Ahhh so Cute!! #Kittens #cats"
+        push_image_to_branch(image_path)
 
     # Create a post on Bluesky
     create_bsky_post(session, pds_url, post_content, embed)
