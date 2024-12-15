@@ -2,7 +2,7 @@ name: OnlyPuppies Bluesky Workflow
 
 on:
   schedule:
-    - cron: "0 13,22 * * *" # Runs twice a day, at 1:00 PM and 10:00 PM UTC
+    - cron: "20 04 * * *" # Runs twice a day, at 1:00 PM and 10:00 PM UTC
 
   workflow_dispatch:
     # Allows manual triggers of the workflow for testing.
