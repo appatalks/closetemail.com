@@ -50,7 +50,7 @@ def generate_puppy_image():
         },
         json={
             "model": "dall-e-3",
-            "prompt": "Create an image of a dog or puppies that is creative and unique. Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. Let the puppies be doing anything from playing to resting, exploring, or interacting in surprising ways.",
+            "prompt": "Create an image of a dog or puppies that is creative and unique with a Christmas Theme. Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. Let the puppies be doing anything from playing to resting, exploring, or interacting in surprising ways.",
             "n": 1,
             "size": "1024x1024"
         }
