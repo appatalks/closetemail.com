@@ -52,10 +52,11 @@ def generate_puppy_image():
     )
 
     result = client.images.generate(
-        model="gpt-image-1",
+        # model="gpt-image-1",
+        model="dall-e-3",
         prompt=prompt,
         size="1024x1024",  # Default size, adjust if necessary
-        quality="medium"   
+        # quality="medium"   
     )
     
     # Extract base64 image data and decode it
