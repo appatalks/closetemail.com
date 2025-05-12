@@ -1,6 +1,7 @@
 import os
 import random
 import requests
+import base64
 from openai import OpenAI
 from datetime import datetime, timezone
 from typing import List
