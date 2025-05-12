@@ -55,7 +55,7 @@ def generate_puppy_image():
         model="gpt-image-1",
         prompt=prompt,
         size="1024x1024",  # Default size, adjust if necessary
-        quality="auto"     # Automatically determine the best quality
+        quality="medium"   
     )
     
     # Extract base64 image data and decode it
