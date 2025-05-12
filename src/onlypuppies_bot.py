@@ -45,18 +45,15 @@ def generate_puppy_image():
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     
     prompt = (
-        "Create an image of a dog or puppies that is creative and unique with a Summer Time theme with Summer fun activities. "
-        "Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. "
-        "Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. "
-        "Let the puppies be doing anything from playing to resting, exploring, or interacting in surprising ways."
+        "Create an image of a dog or puppies that is creative and unique with a Summer Time theme with Summer fun activities. Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. Let the puppies be doing anything from playing to resting, exploring, or interacting in surprising ways."
     )
 
     result = client.images.generate(
-        # model="gpt-image-1",
-        model="dall-e-3",
+        model="gpt-image-1",
+        # model="dall-e-3",
         prompt=prompt,
         size="1024x1024",  # Default size, adjust if necessary
-        # quality="medium"   
+        quality="medium"   
     )
     
     # Extract base64 image data and decode it
