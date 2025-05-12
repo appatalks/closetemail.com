@@ -57,7 +57,7 @@ def generate_kitten_image():
         model="gpt-image-1",
         prompt=prompt,
         size="1024x1024",  # Default size, adjust if necessary
-        quality="auto"     # Automatically determine the best quality
+        quality="medium"     # Automatically determine the best quality
     )
     
     # Extract base64 image data and decode it
