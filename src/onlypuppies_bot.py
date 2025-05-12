@@ -1,6 +1,7 @@
 import os
 import random
 import requests
+import base64
 from openai import OpenAI
 from datetime import datetime, timezone
 from typing import List
@@ -39,33 +40,47 @@ def create_bsky_post(session, pds_url, post_content, embed=None):
     resp.raise_for_status()
     return resp.json()
 
-def generate_puppy_image():
-    # https://platform.openai.com/docs/api-reference/images
-    api_key = os.getenv("OPENAI_API_KEY")
-    response = requests.post(
-        "https://api.openai.com/v1/images/generations",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}"
-        },
-        json={
-            "model": "dall-e-3",
-            "prompt": "Create an image of a dog or puppies that is creative and unique with a Summer Time theme with Summer fun activities. Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. Let the puppies be doing anything from playing to resting, exploring, or interacting in surprising ways.",
-            "n": 1,
-            "size": "1024x1024"
-        }
+def generate_kitten_image():
+    # Update to modern gpt-image-1 endpoint
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    
+    prompt = (
+        "Create an image of a dog or puppies that is creative and unique with a Summer Time theme with Summer fun activities. "
+        "Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. "
+        "Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. "
+        "Let the puppies be doing anything from playing to resting, exploring, or interacting in surprising ways."
     )
-    response.raise_for_status()
-    data = response.json()
-    return data['data'][0]['url']
+
+    result = client.images.generate(
+        model="gpt-image-1",
+        prompt=prompt,
+        size="1024x1024",  # Default size, adjust if necessary
+        quality="auto"     # Automatically determine the best quality
+    )
+    
+    # Extract base64 image data and decode it
+    image_base64 = result.data[0].b64_json
+    image_bytes = base64.b64decode(image_base64)
+    
+    # Save image to file
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_file = f"generated/images/generated_puppy_{timestamp}.png"
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    with open(output_file, "wb") as f:
+        f.write(image_bytes)
+    
+    # Compress the image to ensure it's under 1MB for Bluesky
+    compress_image(output_file)
+    
+    return output_file
 
 def generate_puppy_fact():
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "You are an artist and a poet. You like to give fun, quick, quirky and little-known facts about dogs and puppies."},
-            {"role": "user", "content": "Tell me something interesting about dogs or puppies in one short sentance. Make sure its a random little know fact, something not very well known."}
+            {"role": "system", "content": "You are an artist and a poet. You like to give fun, quick, quirky and little-known facts about puppies and dogs."},
+            {"role": "user", "content": "Tell me something interesting about puppies in one short sentance."}
         ]
     )
     
@@ -85,20 +100,20 @@ def compress_image(image_path, max_size=1000000):
             img = img.convert('RGB')
         
         # Compress and resize iteratively until the image is under the max size
+        img_format = 'JPEG'  # Use JPEG to ensure better compression
         buffer = io.BytesIO()
         quality = 85
         width, height = img.size
-
         while True:
             buffer.seek(0)
-            img.save(buffer, format='JPEG', quality=quality)
+            img.save(buffer, format=img_format, quality=quality)
             size = buffer.tell()
-            if size <= max_size and quality > 10:
+            if size <= max_size or quality <= 10:
                 break
             # Reduce quality further if needed
             quality -= 5
             # Resize if quality alone is not enough
-            if size > max_size and quality <= 50:
+            if quality <= 50:
                 width = int(width * 0.9)
                 height = int(height * 0.9)
                 img = img.resize((width, height), Image.ANTIALIAS)
@@ -177,34 +192,18 @@ def main():
     # Randomly decide whether to post an image or a fun fact
     if random.choice([True, False]):
         # Generate a puppy image
-        image_url = generate_puppy_image()
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        image_path = f"generated/images/generated_puppy_{timestamp}.png"
-        os.makedirs(os.path.dirname(image_path), exist_ok=True)
-        download_image(image_url, image_path)
-        # Compress the image to ensure it's under 1MB
-        compress_image(image_path)
+        image_path = generate_puppy_image()
         alt_text = "A cute puppy in a playful pose"
         embed = upload_images(pds_url, session["accessJwt"], [image_path], alt_text)
-        post_content = "🐾🐾 puppies and dogs 🐾🐾"
+        post_content = "🐾🐾 puppies and dogs 🐾🐾 #puppies #dogs"
         # Push image to generated branch
         push_image_to_branch(image_path)
     else:
         # Generate a puppy fun fact
-        # post_content = generate_puppy_fact() # Disabled as it always generating the same facts...
-        # print("Puppy Fact:", post_content)
-        # embed = None
-        #
-        # Just post a cute pic for now.
-        image_url = generate_puppy_image()
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        image_path = f"generated/images/generated_puppy_{timestamp}.png"
-        os.makedirs(os.path.dirname(image_path), exist_ok=True)
-        download_image(image_url, image_path)
-        compress_image(image_path)
+        image_path = generate_puppy_image()
         alt_text = "A cute puppy in a playful pose"
         embed = upload_images(pds_url, session["accessJwt"], [image_path], alt_text)
-        post_content = "🐾🐾 puppies and dogs 🐾🐾"
+        post_content = "🐾🐾 puppies and dogs 🐾🐾 #puppies #dogs"
         push_image_to_branch(image_path)
 
     # Create a post on Bluesky
