@@ -99,20 +99,20 @@ def compress_image(image_path, max_size=1000000):
             img = img.convert('RGB')
         
         # Compress and resize iteratively until the image is under the max size
-        img_format = 'JPEG'  # Use JPEG to ensure better compression
         buffer = io.BytesIO()
         quality = 85
         width, height = img.size
+
         while True:
             buffer.seek(0)
-            img.save(buffer, format=img_format, quality=quality)
+            img.save(buffer, format='JPEG', quality=quality)
             size = buffer.tell()
-            if size <= max_size or quality <= 10:
+            if size <= max_size and quality > 10:
                 break
             # Reduce quality further if needed
             quality -= 5
             # Resize if quality alone is not enough
-            if quality <= 50:
+            if size > max_size and quality <= 50:
                 width = int(width * 0.9)
                 height = int(height * 0.9)
                 img = img.resize((width, height), Image.ANTIALIAS)
