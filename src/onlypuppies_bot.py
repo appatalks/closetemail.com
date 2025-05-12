@@ -40,7 +40,7 @@ def create_bsky_post(session, pds_url, post_content, embed=None):
     resp.raise_for_status()
     return resp.json()
 
-def generate_kitten_image():
+def generate_puppy_image():
     # Update to modern gpt-image-1 endpoint
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     
