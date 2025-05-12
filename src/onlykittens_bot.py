@@ -71,6 +71,9 @@ def generate_kitten_image():
     with open(output_file, "wb") as f:
         f.write(image_bytes)
     
+    # Compress the image to ensure it's under 1MB for Bluesky
+    compress_image(output_file)
+    
     return output_file
 
 def generate_kitten_fact():
