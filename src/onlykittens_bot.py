@@ -45,12 +45,9 @@ def generate_kitten_image():
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     
     prompt = (
-        "Create an image of a cat or kittens that is creative and unique with a Summer Time theme with "
+        "Random seeding. Create an image of a super cute cat or kittens that is creative and unique with a Summer Time theme with "
         "Summer fun activities. Choose a random art style, such as photo realistic, surrealism, realism, "
-        "anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. "
-        "Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or "
-        "imaginative places. Let the kittens be doing anything from playing to resting, exploring, or "
-        "interacting in surprising ways."
+        "anime, modern cartoon, watercolor, abstract, black and white or digital painting. "
     )
 
     result = client.images.generate(
