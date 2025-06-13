@@ -17,6 +17,23 @@ on:
         description: 'Simulated radiation level'
         required: false
         default: ''
+      debug_level:
+        description: 'Debug level (0=None, 1=Error, 2=Warning, 3=Info, 4=Detail, 5=Trace)'
+        required: false
+        default: '3'
+        type: choice
+        options:
+          - '0'
+          - '1'
+          - '2'
+          - '3'
+          - '4'
+          - '5'
+      save_logs:
+        description: 'Save debug logs as artifact'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   monitor-events:
@@ -39,7 +56,15 @@ jobs:
         BLUESKY_CLOSET_H: ${{ secrets.BLUESKY_CLOSET_H }}
         BLUESKY_CLOSET_P: ${{ secrets.BLUESKY_CLOSET_P }}
       run: |
+        LOG_FILE=""
+        if [ "${{ inputs.save_logs }}" == "true" ]; then
+          LOG_FILE="nuclear_monitoring_$(date +%Y%m%d_%H%M%S).log"
+          echo "Log file will be saved as: $LOG_FILE"
+        fi
+        
         CMD="python src/check_nuclear_events.py"
+        
+        # Add simulation parameters if provided
         if [ -n "${{ inputs.simulate_lat }}" ]; then
           CMD="$CMD --simulate-lat ${{ inputs.simulate_lat }}"
         fi
@@ -49,5 +74,62 @@ jobs:
         if [ -n "${{ inputs.simulate_radiation }}" ]; then
           CMD="$CMD --simulate-radiation ${{ inputs.simulate_radiation }}"
         fi
+        
+        # Add debug level if provided (default to INFO level)
+        DEBUG_LEVEL="${{ inputs.debug_level }}"
+        if [ -z "$DEBUG_LEVEL" ]; then
+          DEBUG_LEVEL="3"
+        fi
+        CMD="$CMD --debug-level $DEBUG_LEVEL"
+        
+        # Add output file if logs should be saved
+        if [ -n "$LOG_FILE" ]; then
+          CMD="$CMD --output $LOG_FILE"
+        fi
+        
         echo "Running: $CMD"
         eval $CMD
+        
+        # Show log summary if file was created
+        if [ -n "$LOG_FILE" ] && [ -f "$LOG_FILE" ]; then
+          echo "=== Log File Summary (last 20 lines) ==="
+          tail -n 20 "$LOG_FILE"
+          echo "=== End of Log Summary ==="
+        fi
+
+    - name: Upload Debug Logs
+      if: ${{ inputs.save_logs == 'true' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuclear-monitoring-logs
+        path: nuclear_monitoring_*.log
+        retention-days: 7
+        if-no-files-found: warn
+
+    - name: Run with regular scheduled check (non-manual trigger)
+      if: github.event_name == 'schedule'
+      env:
+        BLUESKY_CLOSET_H: ${{ secrets.BLUESKY_CLOSET_H }}
+        BLUESKY_CLOSET_P: ${{ secrets.BLUESKY_CLOSET_P }}
+      run: |
+        # For scheduled runs, use debug level 1 (errors only) by default
+        # but save logs to review any potential issues
+        LOG_FILE="scheduled_check_$(date +%Y%m%d_%H%M%S).log"
+        python src/check_nuclear_events.py --debug-level 1 --output $LOG_FILE
+        
+        # Check if the log contains any errors
+        if grep -q "\[ERROR\]" "$LOG_FILE"; then
+          echo "Errors detected in scheduled run. Saving log as artifact."
+          # Create a marker file so the next step knows to upload
+          echo "ERRORS_DETECTED=true" >> $GITHUB_ENV
+        else
+          echo "No errors detected in scheduled run."
+        fi
+
+    - name: Upload Scheduled Run Logs if Errors
+      if: github.event_name == 'schedule' && env.ERRORS_DETECTED == 'true'
+      uses: actions/upload-artifact@v3
+      with:
+        name: scheduled-check-error-logs
+        path: scheduled_check_*.log
+        retention-days: 1
