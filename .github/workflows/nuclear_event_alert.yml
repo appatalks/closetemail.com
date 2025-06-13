@@ -99,7 +99,7 @@ jobs:
 
     - name: Upload Debug Logs
       if: ${{ inputs.save_logs == 'true' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: nuclear-monitoring-logs
         path: nuclear_monitoring_*.log
@@ -128,7 +128,7 @@ jobs:
 
     - name: Upload Scheduled Run Logs if Errors
       if: github.event_name == 'schedule' && env.ERRORS_DETECTED == 'true'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: scheduled-check-error-logs
         path: scheduled_check_*.log
