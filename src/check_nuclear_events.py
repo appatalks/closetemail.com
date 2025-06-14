@@ -26,11 +26,20 @@ DEBUG_LEVEL = DEBUG_INFO
 
 def sanitize_message(message):
     """Sanitize sensitive data in debug messages"""
-    if isinstance(message, dict):
-        return {k: '***' if k.lower() in ['password', 'secret'] else v for k, v in message.items()}
-    elif isinstance(message, str):
-        return message.replace("password", "***").replace("secret", "***")
-    return message
+    sensitive_keys = {'password', 'secret'}
+    
+    def sanitize(value):
+        if isinstance(value, dict):
+            return {k: sanitize('***' if k.lower() in sensitive_keys else v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [sanitize(item) for item in value]
+        elif isinstance(value, str):
+            for key in sensitive_keys:
+                value = value.replace(key, "***")
+            return value
+        return value
+    
+    return sanitize(message)
 
 def debug_print(level, message):
     """Print debug messages if debug level is sufficient"""
@@ -54,8 +63,8 @@ def pretty_json(data):
 # Bluesky API Functions
 def bsky_login_session(pds_url: str, handle: str, password: str):
     debug_print(DEBUG_INFO, f"Attempting Bluesky login with handle: {handle}")
-    payload = {"identifier": handle, "password": password}
-    debug_print(DEBUG_TRACE, sanitize_message(f"Login payload: {json.dumps(payload)}"))
+    payload = {"identifier": handle, "password": "***"}  # Mask password in payload
+    debug_print(DEBUG_TRACE, f"Login payload: {json.dumps({'identifier': handle, 'password': '***'})}")
     
     try:
         debug_print(DEBUG_DETAIL, f"Sending login request to {pds_url}/xrpc/com.atproto.server.createSession")
