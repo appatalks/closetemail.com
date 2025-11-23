@@ -20,7 +20,7 @@ on:
       debug_level:
         description: 'Debug level (0=None, 1=Error, 2=Warning, 3=Info, 4=Detail, 5=Trace)'
         required: false
-        default: '3'
+        default: '4'
         type: choice
         options:
           - '0'
@@ -32,7 +32,7 @@ on:
       save_logs:
         description: 'Save debug logs as artifact'
         required: false
-        default: false
+        default: true
         type: boolean
 
 jobs:
@@ -112,24 +112,15 @@ jobs:
         BLUESKY_CLOSET_H: ${{ secrets.BLUESKY_CLOSET_H }}
         BLUESKY_CLOSET_P: ${{ secrets.BLUESKY_CLOSET_P }}
       run: |
-        # For scheduled runs, use debug level 1 (errors only) by default
-        # but save logs to review any potential issues
+        # For scheduled runs, produce more detailed logs for reporting
         LOG_FILE="scheduled_check_$(date +%Y%m%d_%H%M%S).log"
-        python src/check_nuclear_events.py --debug-level 1 --output $LOG_FILE
-        
-        # Check if the log contains any errors
-        if grep -q "\[ERROR\]" "$LOG_FILE"; then
-          echo "Errors detected in scheduled run. Saving log as artifact."
-          # Create a marker file so the next step knows to upload
-          echo "ERRORS_DETECTED=true" >> $GITHUB_ENV
-        else
-          echo "No errors detected in scheduled run."
-        fi
+        python src/check_nuclear_events.py --debug-level 4 --output $LOG_FILE
+        echo "Scheduled run completed; log written to $LOG_FILE"
 
     - name: Upload Scheduled Run Logs if Errors
-      if: github.event_name == 'schedule' && env.ERRORS_DETECTED == 'true'
+      if: github.event_name == 'schedule'
       uses: actions/upload-artifact@v4
       with:
-        name: scheduled-check-error-logs
+        name: scheduled-check-logs
         path: scheduled_check_*.log
-        retention-days: 1
+        retention-days: 7
