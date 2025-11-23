@@ -2,7 +2,7 @@ name: Nuclear Event Alert System
 
 on:
   schedule:
-    - cron: '*/20 * * * *'  # Runs every 10 minutes
+    - cron: '*/45 * * * *'  # Runs every 10 minutes
   workflow_dispatch:  # Allows for manual trigger
     inputs:
       simulate_lat:
