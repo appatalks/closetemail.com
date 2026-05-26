@@ -1,5 +1,6 @@
 import os
 import random
+import base64
 import requests
 from openai import OpenAI
 from datetime import datetime, timezone
@@ -49,7 +50,7 @@ def generate_kitten_image():
             "Authorization": f"Bearer {api_key}"
         },
         json={
-            "model": "dall-e-3",
+            "model": "gpt-image-1",
             "prompt": "Create an image of a cat or kittens that is creative and unique with a Spring Time theme. Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. Let the kittens be doing anything from playing to resting, exploring, or interacting in surprising ways. Let's also give it a Spring Time Theme.",
             "n": 1,
             "size": "1024x1024"
@@ -57,7 +58,7 @@ def generate_kitten_image():
     )
     response.raise_for_status()
     data = response.json()
-    return data['data'][0]['url']
+    return data['data'][0]['b64_json']
 
 def generate_kitten_fact():
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -177,11 +178,12 @@ def main():
     # Randomly decide whether to post an image or a fun fact
     if random.choice([True, False]):
         # Generate a kitten image
-        image_url = generate_kitten_image()
+        image_b64 = generate_kitten_image()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         image_path = f"generated/images/generated_kitten_{timestamp}.png"
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
-        download_image(image_url, image_path)
+        with open(image_path, 'wb') as f:
+            f.write(base64.b64decode(image_b64))
         # Compress the image to ensure it's under 1MB
         compress_image(image_path)
         alt_text = "A cute kitten in a playful pose"
@@ -195,11 +197,12 @@ def main():
         #print("Kitten Fact:", post_content)
         #embed = None
         #
-        image_url = generate_kitten_image()
+        image_b64 = generate_kitten_image()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         image_path = f"generated/images/generated_kitten_{timestamp}.png"
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
-        download_image(image_url, image_path)
+        with open(image_path, 'wb') as f:
+            f.write(base64.b64decode(image_b64))
         compress_image(image_path)
         alt_text = "A cute kitten in a playful pose"
         embed = upload_images(pds_url, session["accessJwt"], [image_path], alt_text)
