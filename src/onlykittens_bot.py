@@ -51,7 +51,7 @@ def generate_kitten_image():
         },
         json={
             "model": "gpt-image-1",
-            "prompt": "Create an image of a cat or kittens that is creative and unique with a Spring Time theme. Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. Let the kittens be doing anything from playing to resting, exploring, or interacting in surprising ways. Let's also give it a Spring Time Theme.",
+            "prompt": "Create an image of a cat or kittens that is creative and unique with a Summer Time theme. Choose a random art style. Choose a random setting. Let the kittens be active.",
             "n": 1,
             "size": "1024x1024"
         }
