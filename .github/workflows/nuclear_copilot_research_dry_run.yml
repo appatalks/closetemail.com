@@ -56,16 +56,40 @@ jobs:
 
 
           This is a dry run. Do not claim that a nuclear event occurred, do not create alerts, and do not modify files.
-          Use web research only to explain what additional authoritative context is available. Restrict web requests to USGS, NRC, IAEA, CTBTO, and GDACS. Return Markdown with these sections: Evidence received, Source availability, Verification limits, and Recommended human follow-up. Cite each source URL used.
+          Use web research only to explain what additional authoritative context is available. Restrict web requests to USGS, Safecast, NRC, IAEA, CTBTO, and GDACS. Return Markdown with these sections: Evidence received, Source availability, Verification limits, and Recommended human follow-up. Cite each source URL used.
           EOF
           )
 
           copilot -p "$prompt" -s --no-ask-user \
             --available-tools=web_fetch \
-            --allow-url='https://earthquake.usgs.gov/*,https://www.nrc.gov/*,https://www.iaea.org/*,https://www.ctbto.org/*,https://www.gdacs.org/*' \
+            --allow-url='https://earthquake.usgs.gov/*,https://api.safecast.org/*,https://safecast.org/*,https://www.nrc.gov/*,https://www.iaea.org/*,https://www.ctbto.org/*,https://www.gdacs.org/*' \
             > copilot-research-report.md
 
           test -s copilot-research-report.md
+
+          python - <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          allowed_hosts = {
+              "earthquake.usgs.gov",
+              "api.safecast.org",
+              "safecast.org",
+              "www.nrc.gov",
+              "www.iaea.org",
+              "www.ctbto.org",
+              "www.gdacs.org",
+          }
+          report = Path("copilot-research-report.md").read_text(encoding="utf-8")
+          cited_hosts = {urlparse(url).hostname for url in re.findall(r"https?://[^\s)]+", report)}
+          unexpected_hosts = sorted(host for host in cited_hosts if host not in allowed_hosts)
+          if unexpected_hosts:
+              print(f"Unexpected report citation host(s): {', '.join(unexpected_hosts)}", file=sys.stderr)
+              sys.exit(1)
+          PY
+
           cat copilot-research-report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload research report

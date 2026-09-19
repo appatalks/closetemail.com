@@ -79,7 +79,7 @@ def pretty_json(data):
 # Bluesky API Functions
 def bsky_login_session(pds_url: str, handle: str, password: str):
     debug_print(DEBUG_INFO, f"Attempting Bluesky login with handle: {handle}")
-    payload = {"identifier": handle, "password": "***"}  # Mask password in payload
+    payload = {"identifier": handle, "password": password}
     debug_print(DEBUG_TRACE, f"Login payload: {json.dumps({'identifier': handle, 'password': '***'})}")
     
     try:
@@ -290,9 +290,6 @@ def get_nearest_radiation_sample(lat, lon, event_time, monitoring_end=None):
         debug_print(DEBUG_TRACE, "Sending request to Safecast API...")
         response = requests.get(SAFECAST_URL, params=params, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
-        
-        # Debug: Log the raw response content at TRACE level
-        debug_print(DEBUG_TRACE, f"Raw Safecast API Response: {response.text[:1000]}..." if len(response.text) > 1000 else response.text)
 
         data = response.json()
         

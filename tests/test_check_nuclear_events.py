@@ -77,6 +77,24 @@ class NuclearEventMonitorTests(unittest.TestCase):
             with self.assertRaises(monitor.MonitoringDataError):
                 monitor.get_usgs_events(20)
 
+    def test_bluesky_login_sends_password_without_logging_it(self):
+        session = {"did": "did:example:test", "accessJwt": "test-token"}
+        with patch.object(monitor.requests, "post", return_value=FakeResponse(session)) as post, patch.object(
+            monitor,
+            "debug_print",
+        ) as debug:
+            result = monitor.bsky_login_session("https://bsky.social", "example.test", "test-password")
+
+        self.assertEqual(result, session)
+        self.assertEqual(
+            post.call_args.kwargs["json"],
+            {"identifier": "example.test", "password": "test-password"},
+        )
+        self.assertNotIn(
+            "test-password",
+            " ".join(str(call.args) for call in debug.call_args_list),
+        )
+
     def test_partial_simulation_input_is_rejected(self):
         with self.assertRaises(ValueError):
             monitor.main(simulate_lat="1", lookback_minutes=20)
