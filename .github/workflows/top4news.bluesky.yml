@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
     # Allows manual triggers of the workflow for testing.
 
+permissions:
+  contents: read
+
 jobs:
   post_top4news_content:
     runs-on: ubuntu-latest
