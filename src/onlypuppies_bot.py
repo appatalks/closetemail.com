@@ -50,9 +50,10 @@ def generate_puppy_image():
             "Authorization": f"Bearer {api_key}"
         },
         json={
-            "model": "gpt-image-1",
-            "prompt": "Create an image of a dog or puppies that is creative and unique with a Spring time jolly theme. Choose a random art style, such as photo realistic, surrealism, realism, anime, 1970 cartoon, modern cartoon, watercolor, abstract, black and white or digital painting. Choose a random setting like fantasy worlds, cityscapes, steam punk, lush forests, outerspace or imaginative places. Let the puppies be doing anything from playing to resting, exploring, or interacting in surprising ways. Spring time theme",
+            "model": "gpt-image-2.5-flare",
+            "prompt": "Create a creative, unique image of a dog or puppies in a cozy autumn setting, with colorful fallen leaves, warm golden light, and seasonal fall details. Choose a random art style, such as photorealistic, surrealism, realism, anime, 1970s cartoon, modern cartoon, watercolor, abstract, black and white, or digital painting. Choose a random setting like fantasy worlds, cityscapes, forests, or imaginative places. Let the puppies play, rest, explore, or interact in surprising ways.",
             "n": 1,
+            "quality": "medium",
             "size": "1024x1024"
         }
     )

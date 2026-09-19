@@ -50,9 +50,10 @@ def generate_kitten_image():
             "Authorization": f"Bearer {api_key}"
         },
         json={
-            "model": "gpt-image-1",
-            "prompt": "Create an image of a cat or kittens that is creative and unique with a Summer Time theme. Choose a random art style. Choose a random setting. Let the kittens be active.",
+            "model": "gpt-image-2.5-flare",
+            "prompt": "Create a creative, unique image of a cat or kittens in a cozy autumn setting, with colorful fallen leaves, warm golden light, and seasonal fall details. Choose a random art style and setting. Let the kittens be active and playful.",
             "n": 1,
+            "quality": "medium",
             "size": "1024x1024"
         }
     )
