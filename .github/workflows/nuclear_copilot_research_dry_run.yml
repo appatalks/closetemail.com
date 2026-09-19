@@ -1,0 +1,76 @@
+name: Nuclear Monitor Copilot Research Dry Run
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  copilot-requests: write
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install Copilot CLI
+        run: npm install --global @github/copilot
+
+      - name: Create synthetic inconclusive evidence
+        run: |
+          cat > monitoring-evidence.json <<'EOF'
+          {
+            "outcome": "inconclusive",
+            "seismic_source": "USGS",
+            "seismic_event": {
+              "magnitude": 3.2,
+              "depth_km": 1.0,
+              "occurred_at": "2026-09-19T00:00:00Z",
+              "source_url": "https://earthquake.usgs.gov/fdsnws/event/1/"
+            },
+            "radiation_source": "Safecast",
+            "radiation_evidence": "No recent CPM sample was available within 20 km after the event.",
+            "notification_sent": false
+          }
+          EOF
+
+      - name: Research official context with Copilot CLI
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          prompt=$(cat <<'EOF'
+          Review this synthetic monitoring evidence:
+
+          EOF
+          )
+          prompt+="$(cat monitoring-evidence.json)"
+          prompt+=$(cat <<'EOF'
+
+
+          This is a dry run. Do not claim that a nuclear event occurred, do not create alerts, and do not modify files.
+          Use web research only to explain what additional authoritative context is available. Restrict web requests to USGS, NRC, IAEA, CTBTO, and GDACS. Return Markdown with these sections: Evidence received, Source availability, Verification limits, and Recommended human follow-up. Cite each source URL used.
+          EOF
+          )
+
+          copilot -p "$prompt" -s --no-ask-user \
+            --available-tools=web_fetch \
+            --allow-url='https://earthquake.usgs.gov/*,https://www.nrc.gov/*,https://www.iaea.org/*,https://www.ctbto.org/*,https://www.gdacs.org/*' \
+            > copilot-research-report.md
+
+          test -s copilot-research-report.md
+          cat copilot-research-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload research report
+        uses: actions/upload-artifact@v7
+        with:
+          name: nuclear-monitor-copilot-research-dry-run
+          path: copilot-research-report.md
+          retention-days: 7

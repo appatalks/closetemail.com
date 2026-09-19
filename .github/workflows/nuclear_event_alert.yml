@@ -2,7 +2,7 @@ name: Nuclear Event Alert System
 
 on:
   schedule:
-    - cron: '*/45 * * * *'  # Runs every 10 minutes
+    - cron: '7,37 * * * *'
   workflow_dispatch:  # Allows for manual trigger
     inputs:
       simulate_lat:
@@ -34,13 +34,23 @@ on:
         required: false
         default: true
         type: boolean
+      dry_run:
+        description: 'Evaluate and log alerts without posting to Bluesky'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
 
+concurrency:
+  group: nuclear-event-monitor
+  cancel-in-progress: false
+
 jobs:
   monitor-events:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
     - name: Check out the repository
@@ -54,76 +64,44 @@ jobs:
     - name: Install dependencies
       run: pip install requests
 
-    - name: Build and Run Monitoring Command
+    - name: Run monitoring check
       env:
         BLUESKY_CLOSET_H: ${{ secrets.BLUESKY_CLOSET_H }}
         BLUESKY_CLOSET_P: ${{ secrets.BLUESKY_CLOSET_P }}
       run: |
         LOG_FILE=""
-        if [ "${{ inputs.save_logs }}" == "true" ]; then
+        if [[ "${{ github.event_name == 'schedule' || inputs.save_logs }}" == "true" ]]; then
           LOG_FILE="nuclear_monitoring_$(date +%Y%m%d_%H%M%S).log"
           echo "Log file will be saved as: $LOG_FILE"
         fi
-        
-        CMD="python src/check_nuclear_events.py"
-        
-        # Add simulation parameters if provided
-        if [ -n "${{ inputs.simulate_lat }}" ]; then
-          CMD="$CMD --simulate-lat ${{ inputs.simulate_lat }}"
-        fi
-        if [ -n "${{ inputs.simulate_lon }}" ]; then
-          CMD="$CMD --simulate-lon ${{ inputs.simulate_lon }}"
-        fi
-        if [ -n "${{ inputs.simulate_radiation }}" ]; then
-          CMD="$CMD --simulate-radiation ${{ inputs.simulate_radiation }}"
-        fi
-        
-        # Add debug level if provided (default to INFO level)
-        DEBUG_LEVEL="${{ inputs.debug_level }}"
-        if [ -z "$DEBUG_LEVEL" ]; then
-          DEBUG_LEVEL="3"
-        fi
-        CMD="$CMD --debug-level $DEBUG_LEVEL"
-        
-        # Add output file if logs should be saved
-        if [ -n "$LOG_FILE" ]; then
-          CMD="$CMD --output $LOG_FILE"
-        fi
-        
-        echo "Running: $CMD"
-        eval $CMD
-        
-        # Show log summary if file was created
-        if [ -n "$LOG_FILE" ] && [ -f "$LOG_FILE" ]; then
+
+        args=(
+          python src/check_nuclear_events.py
+          --debug-level "${{ inputs.debug_level || '3' }}"
+          --lookback-minutes 30
+        )
+        [[ -n "${{ inputs.simulate_lat }}" ]] && args+=(--simulate-lat "${{ inputs.simulate_lat }}")
+        [[ -n "${{ inputs.simulate_lon }}" ]] && args+=(--simulate-lon "${{ inputs.simulate_lon }}")
+        [[ -n "${{ inputs.simulate_radiation }}" ]] && args+=(--simulate-radiation "${{ inputs.simulate_radiation }}")
+        [[ "${{ inputs.dry_run }}" == "true" ]] && args+=(--dry-run)
+        [[ -n "$LOG_FILE" ]] && args+=(--output "$LOG_FILE")
+
+        printf 'Running:'
+        printf ' %q' "${args[@]}"
+        printf '\n'
+        "${args[@]}"
+
+        if [[ -n "$LOG_FILE" && -f "$LOG_FILE" ]]; then
           echo "=== Log File Summary (last 20 lines) ==="
           tail -n 20 "$LOG_FILE"
           echo "=== End of Log Summary ==="
         fi
 
-    - name: Upload Debug Logs
-      if: ${{ inputs.save_logs == 'true' }}
+    - name: Upload monitoring logs
+      if: ${{ always() && (github.event_name == 'schedule' || inputs.save_logs) }}
       uses: actions/upload-artifact@v7
       with:
         name: nuclear-monitoring-logs
         path: nuclear_monitoring_*.log
         retention-days: 7
         if-no-files-found: warn
-
-    - name: Run with regular scheduled check (non-manual trigger)
-      if: github.event_name == 'schedule'
-      env:
-        BLUESKY_CLOSET_H: ${{ secrets.BLUESKY_CLOSET_H }}
-        BLUESKY_CLOSET_P: ${{ secrets.BLUESKY_CLOSET_P }}
-      run: |
-        # For scheduled runs, produce more detailed logs for reporting
-        LOG_FILE="scheduled_check_$(date +%Y%m%d_%H%M%S).log"
-        python src/check_nuclear_events.py --debug-level 4 --output $LOG_FILE
-        echo "Scheduled run completed; log written to $LOG_FILE"
-
-    - name: Upload Scheduled Run Logs if Errors
-      if: github.event_name == 'schedule'
-      uses: actions/upload-artifact@v7
-      with:
-        name: scheduled-check-logs
-        path: scheduled_check_*.log
-        retention-days: 7
